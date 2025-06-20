@@ -19,7 +19,9 @@
   padding: var(--spacing-08) 0;
 }
 
-.footer p, .footer a, .footer li {
+.footer p,
+.footer a,
+.footer li {
   color: #000;
   font-size: medium;
   font-weight: 200;
@@ -37,6 +39,7 @@
 
 .footerLinks {
   gap: var(--spacing-20);
+
 }
 
 .footerList {
@@ -45,4 +48,10 @@
 
 .footerList li {
   padding-block: var(--spacing-04);
+
+}
+
+.footerList img {
+  width: 18px;
+  height: 18px;
 }
