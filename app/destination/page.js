@@ -36,8 +36,11 @@ const planets = [
 
 export const Destinations = () => {
   const [selectedPlanets, setSelectedPlanets] = useState([]);
+  const [customWishlistItems, setCustomWishlistItems] = useState([]);
   let isPlanetSelected = false;
   let numberOfPlanets = 0;
+  const totalWishlistItems =
+    selectedPlanets.length + customWishlistItems.length;
 
   const onAddOrRemovePlanet = (name, index) => {
     // Implement this function
@@ -55,6 +58,38 @@ export const Destinations = () => {
     );
   };
 
+  const onAddCustomWishlistItem = ({ name, thumbnail }) => {
+    setCustomWishlistItems((prevCustomItems) => {
+      // Optional: Prevent adding duplicates for custom items (by name and thumbnail)
+      const isAlreadyAdded = prevCustomItems.some(
+        (item) => item.name === name && item.thumbnail === thumbnail
+      );
+      if (isAlreadyAdded) {
+        alert(
+          `"${name}" with this thumbnail is already in your custom wishlist!`
+        );
+        return prevCustomItems;
+      }
+      return [...prevCustomItems, { name, thumbnail }];
+    });
+  };
+
+  const removeFromWishlist = (nameToRemove, isCustom = false) => {
+    if (isCustom) {
+      // For custom items, we might need to filter by name AND thumbnail if names can be repeated
+      // For simplicity here, we'll just filter by name. If names can be repeated with different images,
+      // you'd need to pass a more unique identifier.
+      setCustomWishlistItems((prevCustomItems) =>
+        prevCustomItems.filter((item) => item.name !== nameToRemove)
+      );
+    } else {
+      // For predefined planets, filter from selectedPlanets
+      setSelectedPlanets((prevSelected) =>
+        prevSelected.filter((name) => name !== nameToRemove)
+      );
+    }
+  };
+
   return (
     <div className="fullBGpicture">
       <main className="mainContent">
@@ -70,30 +105,49 @@ export const Destinations = () => {
               : `You have ${selectedPlanets.length} planet(s) in your wishlist`}
           </p>
 
-          <b>List coming soon after lesson 3!</b>
+          {/* <b>List coming soon after lesson 3!</b> */}
 
           {/* STOP! - this is for week 3!*/}
           {/* TASK - React 1 week 3 */}
           {/* Import the AddWishlistItem react component */}
-          {/* <AddWishlistItem /> */}
+          <AddWishlistItem onAddWishlistItem={onAddCustomWishlistItem} />
           {/* TASK - React 1 week 3 */}
           {/* Convert the list, so it is using selectedPlanets.map() to display the items  */}
           {/* Implement the "REMOVE" function */}
           {/* uncomment the following code snippet: */}
-          {/* 
-          <h3>Your current wishlist</h3>
-          <div className={styles.wishlistList}>
-            <PlanetWishlistItem 
-              name="europa"
-              onRemove={() => removeFromWishlist('europa')}
-              thumbnail="/destination/image-europa.png"
-            />
-            <PlanetWishlistItem 
-              name="europa"
-              onRemove={() => removeFromWishlist('europa')}
-              thumbnail="/destination/image-europa.png"
-            />
-          </div> */}
+          {totalWishlistItems > 0 && (
+            <>
+              <h3>Your current wishlist</h3>
+              <div className={styles.wishlistList}>
+                {/* Map over predefined selected planets */}
+                {selectedPlanets.map((planetName) => {
+                  const planetDetails = planets.find(
+                    (planet) => planet.name === planetName
+                  );
+                  return (
+                    <PlanetWishlistItem
+                      key={planetName} // Key using planet name
+                      name={planetDetails.name}
+                      onRemove={() =>
+                        removeFromWishlist(planetDetails.name, false)
+                      } // Indicate it's not custom
+                      thumbnail={planetDetails.thumbnail}
+                    />
+                  );
+                })}
+
+                {/* Map over custom wishlist items */}
+                {customWishlistItems.map((item) => (
+                  <PlanetWishlistItem
+                    key={`custom-${item.name}-${item.thumbnail}`} // More unique key for custom items
+                    name={item.name}
+                    onRemove={() => removeFromWishlist(item.name, true)} // Indicate it's custom
+                    thumbnail={item.thumbnail}
+                  />
+                ))}
+              </div>
+            </>
+          )}
         </section>
         <section className="card">
           <h2>Possible destinations</h2>
